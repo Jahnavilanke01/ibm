@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Travel Planner — Powered by IBM Granite</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="14" cy="14" r="13" stroke="#3b82d4" stroke-width="2"/>
+          <path d="M8 14 Q14 6 20 14 Q14 22 8 14Z" fill="#3b82d4" opacity="0.7"/>
+          <circle cx="14" cy="14" r="3" fill="#3b82d4"/>
+        </svg>
+        <span>AI <strong>Travel Planner</strong></span>
+      </div>
+      <span class="nav-badge">Powered by IBM Granite</span>
+    </div>
+  </nav>
+
+  <!-- ── DEMO BANNER ── -->
+  {% if demo_mode %}
+  <div class="demo-banner">
+    <strong>Demo Mode</strong> — No IBM watsonx.ai credentials detected.
+    Itineraries are generated from a rich template.
+    Add your credentials to <code>.env</code> for live IBM Granite output.
+  </div>
+  {% endif %}
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>Plan Your Perfect Journey</h1>
+      <p>Tell us where you want to go and what you love — our AI builds a personalised day-by-day itinerary in seconds.</p>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+
+    <!-- ── POPULAR DESTINATIONS ── -->
+    <section class="section">
+      <h2 class="section-title">Popular Destinations</h2>
+      <div id="destinations-grid" class="dest-grid">
+        <div class="dest-skeleton"></div>
+        <div class="dest-skeleton"></div>
+        <div class="dest-skeleton"></div>
+        <div class="dest-skeleton"></div>
+      </div>
+    </section>
+
+    <!-- ── PLANNER FORM ── -->
+    <section class="section">
+      <h2 class="section-title">Build Your Itinerary</h2>
+      <form id="planner-form" class="card form-card" novalidate>
+
+        <div class="form-grid">
+
+          <!-- Destination -->
+          <div class="field full">
+            <label for="destination">Destination <span class="req">*</span></label>
+            <input type="text" id="destination" name="destination"
+                   placeholder="e.g. Tokyo, Japan" required />
+          </div>
+
+          <!-- Duration + Travelers -->
+          <div class="field">
+            <label for="duration">Trip Duration (days)</label>
+            <select id="duration" name="duration">
+              <option value="3">3 days — Weekend</option>
+              <option value="5">5 days — Short trip</option>
+              <option value="7" selected>7 days — One week</option>
+              <option value="10">10 days — Extended</option>
+              <option value="14">14 days — Two weeks</option>
+              <option value="21">21 days — Long journey</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="travelers">Travelers</label>
+            <select id="travelers" name="travelers">
+              <option value="solo">Solo traveler</option>
+              <option value="couple">Couple</option>
+              <option value="family with kids">Family with kids</option>
+              <option value="group of friends">Group of friends</option>
+              <option value="seniors">Senior travelers</option>
+            </select>
+          </div>
+
+          <!-- Travel Style + Budget -->
+          <div class="field">
+            <label for="travel_style">Travel Style</label>
+            <select id="travel_style" name="travel_style">
+              <option value="adventure">Adventure & Outdoor</option>
+              <option value="cultural">Cultural & Historical</option>
+              <option value="relaxation">Relaxation & Wellness</option>
+              <option value="foodie">Food & Culinary</option>
+              <option value="luxury">Luxury & Premium</option>
+              <option value="balanced" selected>Balanced Mix</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="budget">Budget Level</label>
+            <select id="budget" name="budget">
+              <option value="budget">Budget (backpacker)</option>
+              <option value="moderate" selected>Moderate (mid-range)</option>
+              <option value="comfort">Comfort (upper-mid)</option>
+              <option value="luxury">Luxury (high-end)</option>
+            </select>
+          </div>
+
+          <!-- Start date + Special reqs -->
+          <div class="field">
+            <label for="start_date">Approximate Start Date</label>
+            <input type="date" id="start_date" name="start_date" />
+          </div>
+
+          <div class="field">
+            <label for="special_requirements">Special Requirements</label>
+            <input type="text" id="special_requirements" name="special_requirements"
+                   placeholder="e.g. vegetarian, wheelchair accessible" />
+          </div>
+
+          <!-- Interests -->
+          <div class="field full">
+            <label>Interests <span class="muted">(select all that apply)</span></label>
+            <div class="interests-grid" id="interests-container">
+              <label class="chip"><input type="checkbox" value="museums" /> Museums</label>
+              <label class="chip"><input type="checkbox" value="beaches" /> Beaches</label>
+              <label class="chip"><input type="checkbox" value="hiking" /> Hiking</label>
+              <label class="chip"><input type="checkbox" value="local cuisine" /> Local Cuisine</label>
+              <label class="chip"><input type="checkbox" value="nightlife" /> Nightlife</label>
+              <label class="chip"><input type="checkbox" value="shopping" /> Shopping</label>
+              <label class="chip"><input type="checkbox" value="architecture" /> Architecture</label>
+              <label class="chip"><input type="checkbox" value="photography" /> Photography</label>
+              <label class="chip"><input type="checkbox" value="wildlife" /> Wildlife</label>
+              <label class="chip"><input type="checkbox" value="sports" /> Sports</label>
+              <label class="chip"><input type="checkbox" value="art & culture" /> Art & Culture</label>
+              <label class="chip"><input type="checkbox" value="religious sites" /> Religious Sites</label>
+            </div>
+          </div>
+
+        </div><!-- /form-grid -->
+
+        <div class="form-footer">
+          <button type="submit" id="submit-btn" class="btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            Generate My Itinerary
+          </button>
+          <button type="button" id="clear-btn" class="btn-secondary">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ── RESULT ── -->
+    <section id="result-section" class="section hidden">
+      <div class="result-header">
+        <h2 class="section-title" id="result-title">Your Itinerary</h2>
+        <button id="copy-btn" class="btn-icon" title="Copy to clipboard">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+          </svg>
+          Copy
+        </button>
+      </div>
+      <div id="itinerary-output" class="card itinerary-card"></div>
+    </section>
+
+    <!-- ── LOADING ── -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-box">
+        <div class="spinner"></div>
+        <p class="loading-title">Crafting your perfect itinerary…</p>
+        <p class="loading-sub">IBM Granite is personalising your trip</p>
+        <div class="loading-steps" id="loading-steps">
+          <span class="step active">Analysing destination</span>
+          <span class="step">Planning day-by-day schedule</span>
+          <span class="step">Adding dining &amp; stay tips</span>
+          <span class="step">Finalising recommendations</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ERROR TOAST ── -->
+    <div id="error-toast" class="toast hidden">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="error-msg"></span>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>AI Travel Planner &mdash; Built with <strong>IBM watsonx.ai Granite LLM</strong> &amp; Python Flask</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
